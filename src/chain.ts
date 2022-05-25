@@ -1,25 +1,29 @@
 import { Block } from "./block";
 import { logger } from "./logger";
+import { mempool } from "./mempool";
 
 class ChainManager {
-  longestChainHeight: number = 0
-  longestChainTip: Block | null = null
+  longestChainHeight: number = 0;
+  longestChainTip: Block | null = null;
 
   init() {
-    this.longestChainTip = Block.makeGenesis()
+    this.longestChainTip = Block.makeGenesis();
   }
   async onValidBlockArrival(block: Block) {
-    const height = await block.loadHeight()
+    const height = await block.loadHeight();
 
     if (height === null) {
-      return
+      return;
     }
     if (height > this.longestChainHeight) {
-      logger.debug(`New longest chain has height ${height} and tip ${block.blockid}`)
-      this.longestChainHeight = height
-      this.longestChainTip = block
+      logger.debug(
+        `New longest chain has height ${height} and tip ${block.blockid}`
+      );
+      this.longestChainHeight = height;
+      this.longestChainTip = block;
+      mempool.currentchaintip = block;
     }
   }
 }
 
-export const chainManager = new ChainManager()
+export const chainManager = new ChainManager();
